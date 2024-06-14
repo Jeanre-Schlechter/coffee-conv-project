@@ -1,0 +1,27 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "npm run development",
+        "development": "mix",
+        "prod": "npm run production",
+        "production": "mix --production",
+        "watch": "npm run development -- --watch"
+    },
+    "devDependencies": {
+        "axios": "^1.6.4",
+        "laravel-mix": "^6.0.49",
+        "resolve-url-loader": "^5.0.0",
+        "sass": "^1.77.4",
+        "sass-loader": "^12.1.0",
+        "vue-loader": "^17.4.2",
+        "webpack-dev-server": "^5.0.4"
+    },
+    "dependencies": {
+        "bulma": "^1.0.1",
+        "bulma-carousel": "^4.0.24",
+        "tail": "^2.2.6",
+        "vue": "^3.4.27",
+        "webpack": "^5.91.0"
+    }
+}
