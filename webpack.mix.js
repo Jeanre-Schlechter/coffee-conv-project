@@ -10,6 +10,20 @@ mix.webpackConfig({
     devServer: {
         hot: true, // Enable hot module replacement
     },
+    module: {
+        rules: [
+            {
+                test: /\.m?js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env']
+                    }
+                }
+            }
+        ]
+    }
 })
 .js('resources/js/app.js', 'public/js')
 .sass('resources/sass/app.scss', 'public/css')
