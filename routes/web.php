@@ -22,6 +22,7 @@ Route::get('/filter-products', 'App\Http\Controllers\TestController@getFilteredP
 
 Route::get('/wishlist', 'App\Http\Controllers\TestController@getUserWishlist');
 Route::get('/admin', 'App\Http\Controllers\TestController@admin');
+
 Route::post('/user', 'App\Http\Controllers\AdminController@addNewUser');
 Route::post('/category', 'App\Http\Controllers\AdminController@addNewCategory');
 Route::post('/product', 'App\Http\Controllers\AdminController@addNewProduct');

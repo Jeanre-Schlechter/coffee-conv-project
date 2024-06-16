@@ -281,26 +281,32 @@
             </header>
             <section class="modal-card-body">
                 <div class="field">
+                    <label class="label">Main Product Image</label>
+                    <div v-if="!imageUrl" class="image-preview">
+                        <figure class="image is-2by1">
+                            <img v-bind:src="productModalInfo.mainImage" />
+                        </figure>
+                    </div>
+                    <div v-else>
+                        <img :src="imageUrl" alt="Preview" style="max-width: 300px; max-height: 300px;">
+                    </div>
+                    <div class="file">
+                        <label class="file-label">
+                            <input class="file-input" type="file" @change="handleFileUpload" accept="image/*">
+                            <span class="file-cta">
+                            <span class="file-icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span class="file-label">Choose a file…</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="field">
                     <label class="label">Name</label>
                     <div class="control">
                         <input class="input" type="text" v-model="productModalInfo.name">
                     </div>
-                </div>
-                <div>
-                <section class="section">
-                        <!-- Start Carousel -->
-                        <div id="carousel-demo" class="carousel">
-                            <div class="item-1">
-                                    <img src="https://bulma.io/assets/images/placeholders/1280x960.png" alt="">
-                            </div>
-                            <div class="item-2">
-                                    <img src="https://bulma.io/assets/images/placeholders/1280x960.png" alt="">
-                            </div>
-                            <div class="item-3">
-                                    <img src="https://bulma.io/assets/images/placeholders/1280x960.png" alt="">
-                            </div>
-                    </div>
-                </section> 
                 </div>
                 <div class="field">
                     <label class="label">Description</label>
@@ -321,22 +327,31 @@
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Main Product Image</label>
-                    <div class="file">
-                        <label class="file-label">
-                            <input class="file-input" type="file" name="resume" />
-                            <span class="file-cta">
-                            <span class="file-icon">
-                                <i class="fas fa-upload"></i>
-                            </span>
-                            <span class="file-label"> Choose a file… </span>
-                            </span>
-                        </label>
+                <div class="dropdown is-hoverable">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4">
+                        <span v-if="!productModalInfo.category">Category</span>
+                        <span v-else>@{{ chosenCategory }}</span>
+                        <span class="icon is-small">
+                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+                        <div class="dropdown-content">
+                            <div class="dropdown-item" v-for="category in categories">
+                                <a v-on:click="chooseProductCategory(category)"> @{{ category.name }} </a>
+                            </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
+                
+                
             </section>
             <footer class="modal-card-foot">
-                <button class="button is-success" @click="addProduct()">Save</button>
+                <button v-if="!productModalInfo.id" class="button is-success" @click="addProduct()">Save</button>
+                <button v-else class="button is-success" @click="editProduct()">Update</button>
                 <button class="button" @click="productModalVisible = false">Cancel</button>
             </footer>
         </div>
@@ -344,7 +359,6 @@
     </div>
 </div>
 
-<!-- Include Vue and other scripts here -->
 <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://kit.fontawesome.com/312a26b640.js" crossorigin="anonymous"></script>
@@ -359,6 +373,7 @@
 
     class User {
         constructor(userData = {}) {
+            this.id = userData.id || '';
             this.name = userData.name || '';
             this.surname = userData.surname || '';
             this.email = userData.email || '';
@@ -370,11 +385,12 @@
 
     class Product {
         constructor(productData = {}) {
+            this.id = productData.id || null;
             this.name = productData.name || '';
             this.description = productData.description || '';
             this.price = productData.price || 0;
-            this.quantity = productData.quantity || 0;
-            this.mainImage = productData.mainImage || '';
+            this.qty = productData.qty || 0;
+            this.mainImage = productData.main_image || productData.mainImage || '';
             this.imageCollage = productData.imageCollage || '';
             this.category = productData.category || '';
         }
@@ -382,17 +398,26 @@
 
     class Category {
         constructor(categoryData = {}) {
+            this.id = categoryData.id || '';
             this.name = categoryData.name || '';
             this.description = categoryData.description || '';
             this.logo = categoryData.logo || '';
         }
     }
+
+    let productObjects = products.map(productData => new Product(productData));
+    let categoryObjects = categories.map(categoryData => new Category(categoryData));
+    let userObjects = users.map(userData => new User(userData));
+
+    console.log(productObjects); // Array of Product objects
+    console.log(categoryObjects); // Array of Category objects
+    console.log(userObjects); // Array of User objects
     createApp({
         data() {
             return {
-                products: products,
-                categories: categories,
-                users: users,
+                products: productObjects,
+                categories: categoryObjects,
+                users: userObjects,
                 breadcrumbItems: ['Categories', 'Products', 'Users'],
                 selectedView: 'Products', // Default view
                 userModalInfo: new User(),
@@ -400,24 +425,27 @@
                 categoryModalInfo: new Category(),
                 productModalVisible: false,
                 userModalVisible: false,
-                categoryModalVisible: false
+                categoryModalVisible: false,
+                imageUrl: null,
+                chosenCategory: null,
+                mainImage: 'storage/images/1718470758_cof.jpg'
             }
         },
         computed: {
         
         },
         mounted() {
-            document.addEventListener('DOMContentLoaded', () => {
-                bulmaCarousel.attach('#carousel-demo', {
-                    slidesToScroll: 1,
-                    slidesToShow: 4
-                });
-            });
+
         },
         created() {
             console.log(products);
         },
         methods: {
+            handleFileUpload(event) {
+                var file = event.target.files[0];
+                this.productModalInfo.mainImage = file;
+                this.imageUrl = URL.createObjectURL(file);
+            },
             openModal(selectedInfo = null) {
                 if (this.selectedView === "Categories") {
                     this.categoryModalInfo = selectedInfo ? new Category(selectedInfo) : new Category();
@@ -425,6 +453,7 @@
                 } else if(this.selectedView == "Products") {
                     console.log(selectedInfo);
                     this.productModalInfo = selectedInfo ? new Product(selectedInfo) : new Product();
+                    console.log("haha", this.productModalInfo);
                     this.productModalVisible = true;
                 } else {
                     this.userModalInfo = selectedInfo ? new User(selectedInfo) : new User();
@@ -474,6 +503,7 @@
                 })
                 .then(response => {
                     console.log('Category added successfully:', response.data);
+                    this.categoryModalVisible = false;
                 })
                 .catch(error => {
                     console.error('Category added error:', error);
@@ -482,11 +512,31 @@
             addProduct() {
                 var productInfo = this.productModalInfo;
 
-                axios.post('/product', {
-                    productInfo
+                axios.post('/product/', productInfo, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
                 })
                 .then(response => {
-                    console.log('Product added successfully:', response.data);
+                    console.log(response.data);
+                    this.productModalVisible = false;
+                })
+                .catch(error => {
+                    console.error('Product added error:', error);
+                });
+            },
+            editProduct() {
+                var productInfo = this.productModalInfo;
+
+                var productId = productInfo.id;
+                console.log(productInfo);
+
+                axios.put('/product/' + productId, productInfo, {
+                    
+                })
+                .then(response => {
+                    console.log(response.data);
+                    this.productModalVisible = false;
                 })
                 .catch(error => {
                     console.error('Product added error:', error);
@@ -495,6 +545,14 @@
             openUserModal(user){
                 this.userModalInfo = new User(user);
                 this.userModalVisible = true;
+            },
+            chooseProductCategory(category){
+                console.log(category);
+                this.chosenCategory = category.name;
+                this.productModalInfo.category = category.id;
+
+                console.log(this.productModalInfo.category);
+
             }
         }
     }).mount('#app');
