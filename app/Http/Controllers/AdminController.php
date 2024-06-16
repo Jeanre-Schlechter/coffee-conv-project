@@ -26,6 +26,22 @@ class AdminController extends Controller
         logger()->debug(__METHOD__, [
             $request->all()
         ]);
+
+        $validatedData = $request->validate([
+            'name'          => 'required|string',
+            'description'   => 'required|string',
+            'logo'          => 'required|string'
+        ]);
+
+        $categoryObject = new Category();
+
+        $categoryObject->name            = $validatedData['name'];
+        $categoryObject->description     = $validatedData['description'];
+        $categoryObject->logo           = $validatedData['logo'];
+
+        $categoryObject->save();
+
+        return response()->json(['message' => 'Product created successfully', 'product' => $categoryObject]);
     }
 
     public function addNewProduct(Request $request) 

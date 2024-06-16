@@ -486,9 +486,8 @@
             registerUser() {
                 var userInfo = this.userModalInfo;
 
-                axios.post('/user', {
-                    userInfo
-                })
+                axios.post('/user', userInfo)
+                
                 .then(response => {
                     console.log('Regestration successful:', response.data);
                 })
@@ -498,9 +497,8 @@
             },
             addCategory() {
                 var categoryInfo = this.categoryModalInfo;
-                axios.post('/category', {
-                    categoryInfo
-                })
+                axios.post('/category', categoryInfo)
+
                 .then(response => {
                     console.log('Category added successfully:', response.data);
                     this.categoryModalVisible = false;
