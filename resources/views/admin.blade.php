@@ -512,7 +512,7 @@
             addProduct() {
                 var productInfo = this.productModalInfo;
 
-                axios.post('/product/', productInfo, {
+                axios.post('/product', productInfo, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
