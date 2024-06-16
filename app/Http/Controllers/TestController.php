@@ -25,12 +25,19 @@ class TestController extends BaseController
 
         $categories = Category::all();
 
-        $categories = Category::all();
+        foreach ($products as $product) {
+            // Assuming 'main_image' column stores the blob data
+            $imageData = $product->main_image;
+    
+            // Convert blob data to base64-encoded string
+            $base64Image = base64_encode($imageData);
+    
+            // Assign the base64 string to a new attribute or replace the existing 'main_image' attribute
+            // Here we'll add a new 'base64_image' attribute to each product object
+            $product->main_image = $base64Image;
+        }
 
-        return [
-            'products' => $products,
-            'categories' => $categories
-        ];
+        return compact('products', 'categories');
     }
 
     public function getFilteredProducts(Request $request) 
@@ -46,11 +53,19 @@ class TestController extends BaseController
 
         $products = $category->products()->paginate(10);
 
-        logger()->debug(__METHOD__, [
-            "cate" => $products
-        ]);
+        foreach ($products as $product) {
+            // Assuming 'main_image' column stores the blob data
+            $imageData = $product->main_image;
+    
+            // Convert blob data to base64-encoded string
+            $base64Image = base64_encode($imageData);
+    
+            // Assign the base64 string to a new attribute or replace the existing 'main_image' attribute
+            // Here we'll add a new 'base64_image' attribute to each product object
+            $product->main_image = $base64Image;
+        }
 
-        return $products;
+        return compact('products');
     }
 
     public function testLogin() 
@@ -136,9 +151,23 @@ class TestController extends BaseController
         $users = User::all();
         // if ($userAuthed) {
 
-            return view('admin')->with('products', $products)
-                                ->with('categories', $categories)
-                                ->with('users', $users);
+        foreach ($products as $product) {
+            // Assuming 'main_image' column stores the blob data
+            $imageData = $product->main_image;
+    
+            // Convert blob data to base64-encoded string
+            $base64Image = base64_encode($imageData);
+    
+            // Assign the base64 string to a new attribute or replace the existing 'main_image' attribute
+            // Here we'll add a new 'base64_image' attribute to each product object
+            $product->main_image = $base64Image;
+        }
+
+        logger()->debug(__METHOD__, [
+            $products
+        ]);
+        
+        return view('admin', compact('products', 'categories', 'users'));
     }
 
     public function getUserWishlist(Request $request)

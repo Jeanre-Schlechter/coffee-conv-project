@@ -70,7 +70,7 @@
                         <div class="card-image">
                             <figure class="image is-4by3">
                                 <!-- Use the product image -->
-                                <img :src="product.main_image" alt="Product Image" /> <!-- Assuming each product has an 'image_url' property -->
+                                <img :src="'data:image/jpeg;base64,' + product.main_image" alt="Product Image" /> <!-- Assuming each product has an 'image_url' property -->
                             </figure>
                         </div>
                         <div class="card-content">

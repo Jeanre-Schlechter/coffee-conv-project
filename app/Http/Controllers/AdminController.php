@@ -50,31 +50,24 @@ class AdminController extends Controller
             $request->all()
         ]);
 
-
-        // Validate the request data
         $validatedData = $request->validate([
             'name' => 'required|string',
             'description' => 'required|string',
             'price' => 'required|numeric',
             'qty' => 'required|integer',
             'category' => 'required|exists:categories,id',
-            'mainImage' => 'nullable|file|max:2048' // Adjust max file size as needed
+            'mainImage' => 'nullable|file|max:2048' 
         ]);
 
-        // Process mainImage upload if it exists
         if ($request->hasFile('mainImage')) {
-            $file = $request->file('mainImage');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = 'public/images/' . $fileName;
-            
-            // Store file in storage/app/public/images
-            $storedPath = Storage::put($filePath, file_get_contents($file));
+            $image = $request->file('mainImage');
 
-            // Generate URL for the stored file
-            $url = Storage::url($filePath);
+            $fileContent = file_get_contents($image->getRealPath());
+
+
         } else {
-            // If no mainImage is uploaded, handle accordingly
-            $validatedData['mainImage'] = null; // Or any default behavior you need
+
+            $validatedData['mainImage'] = null;
         }
 
         $productObject = new Product();
@@ -83,10 +76,12 @@ class AdminController extends Controller
         $productObject->description     = $validatedData['description'];
         $productObject->price           = $validatedData['price'];
         $productObject->qty             = $validatedData['qty'];
-        $productObject->main_image      = $url;
+        $productObject->main_image      = $fileContent;
         $productObject->category_id     = $validatedData['category'];
 
         $productObject->save();
+
+        $productObject->main_image = base64_encode($productObject->main_image);
 
         return response()->json(['message' => 'Product created successfully', 'product' => $productObject]);
     }

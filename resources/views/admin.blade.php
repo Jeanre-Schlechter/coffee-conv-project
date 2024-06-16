@@ -284,7 +284,7 @@
                     <label class="label">Main Product Image</label>
                     <div v-if="!imageUrl" class="image-preview">
                         <figure class="image is-2by1">
-                            <img v-bind:src="productModalInfo.mainImage" />
+                            <img v-bind:src="'data:image/jpeg;base64,' + productModalInfo.mainImage" />
                         </figure>
                     </div>
                     <div v-else>
@@ -370,6 +370,16 @@
     let products = @json($products);
     let categories = @json($categories);
     let users = @json($users);
+
+    function arrayBufferToBase64(buffer) {
+        let binary = '';
+        let bytes = new Uint8Array(buffer);
+        let len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+    }
 
     class User {
         constructor(userData = {}) {
@@ -487,7 +497,7 @@
                 var userInfo = this.userModalInfo;
 
                 axios.post('/user', userInfo)
-                
+
                 .then(response => {
                     console.log('Regestration successful:', response.data);
                 })
