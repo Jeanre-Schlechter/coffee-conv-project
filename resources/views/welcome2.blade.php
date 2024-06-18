@@ -23,10 +23,7 @@
 			<a class="navbar-item">
 				<i class="fa-solid fa-user"></i>&nbsp; Profile
 			</a>
-			<a class="navbar-item" @click="fetchUserWishlist">
-				<i class="fa-solid fa-pen-to-square"></i>&nbsp; Wishlist
-			</a>
-			<a class="navbar-item">
+			<a class="navbar-item" @click="fetchUserWishlist()">
 				<i class="fa-solid fa-cart-shopping"></i>&nbsp; Cart
 			</a>
 			@if(Auth::user()->isAdminUser())
@@ -113,7 +110,7 @@
 			<div class="modal-background" v-on:click="wishlistModalVisible = false"></div>
 			<div class="modal-card">
 				<header class="modal-card-head">
-					<p class="modal-card-title">Wishlist</p>
+					<p class="modal-card-title">Cart</p>
 				</header>
 				<section class="modal-card-body">
 					<table class="table is-fullwidth" v-if="wishlistData">
@@ -123,6 +120,7 @@
 								<th>Description</th>
 								<th>Quantity</th>
 								<th>Price</th>
+								<th>Image</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -131,6 +129,11 @@
 								<td>@{{ product.description }}</td>
 								<td>@{{ product.pivot.product_quantity }}</td>
 								<td>R @{{ product.price }}</td>
+								<td>
+									<figure class="image is-32x32">
+										<img :src="'data:image/jpeg;base64,' +product.main_image" />
+									</figure> 
+								</td>
 							</tr>
 							<tr>
 								<td>&nbsp;</td>
@@ -142,7 +145,7 @@
 					</table>
 				</section>
 				<footer class="modal-card-foot">
-					<button class="button is-success" @click="">Send To Cart</button>
+					<button class="button is-success" @click="">Checkout</button>
 					<button class="button" @click="wishlistModalVisible = false">Cancel</button>
 				</footer>
 			</div>

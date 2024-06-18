@@ -106,7 +106,7 @@
                                         <a @click="openModal(product)" class="dropdown-item" >
                                             Update
                                         </a>
-                                        <a class="dropdown-item">
+                                        <a @click="deleteProduct(product)" class="dropdown-item">
                                             Delete
                                         </a>
                                     </div>
@@ -133,7 +133,7 @@
                                         <a @click="openModal(category)" class="dropdown-item">
                                             Update
                                         </a>
-                                        <a class="dropdown-item">
+                                        <a  @click="deleteCategory(category)" class="dropdown-item">
                                             Delete
                                         </a>
                                     </div>
@@ -160,7 +160,7 @@
                                         <a @click="openModal(user)" class="dropdown-item">
                                             Update
                                         </a>
-                                        <a class="dropdown-item">
+                                        <a @click="deleteUser(user)" class="dropdown-item">
                                             Delete
                                         </a>
                                     </div>
@@ -187,56 +187,48 @@
 @endif
 
     <div class="modal" :class="{ 'is-active': userModalVisible }">
-        <div class="modal-background" v-on:click="userModalVisible = false"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title">New User</p>
-            </header>
-            <section class="modal-card-body">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="box">
+                <h2 class="title">Register</h2>
                 <div class="field">
                     <label class="label">Name</label>
                     <div class="control">
-                        <input class="input" type="text" v-model="userModalInfo.name">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Surname</label>
-                    <div class="control">
-                        <input class="input" type="text" v-model="userModalInfo.surname">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Email</label>
-                    <div class="control">
-                        <input class="input" type="email" v-model="userModalInfo.email">
+                        <input class="input" type="text" placeholder="Enter your name" v-model="userModalInfo.name">
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Username</label>
                     <div class="control">
-                        <input class="input" type="text" v-model="userModalInfo.username">
+                        <input class="input" type="text" placeholder="Enter your username to login with" v-model="userModalInfo.username">
                     </div>
-                    <p class="help">This will be your login name.</p>
+                </div>
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Enter your email" v-model="userModalInfo.email">
+                    </div>
                 </div>
                 <div class="field">
                     <label class="label">Password</label>
                     <div class="control">
-                        <input class="input" type="password" v-model="userModalInfo.password">
+                        <input class="input" type="password" placeholder="Enter your password" v-model="userModalInfo.password">
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Confirm Password</label>
                     <div class="control">
-                        <input class="input" type="password" v-model="userModalInfo.confirmPassword">
+                        <input class="input" type="password" placeholder="Confirm your password" v-model="userModalInfo.confirmPassword" :class="{ 'is-danger': !passwordsMatch }">
                     </div>
                 </div>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button is-success" @click="registerUser()">Save</button>
-                <button class="button" @click="userModalVisible = false">Cancel</button>
-            </footer>
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary" @click="registerUser()" :disabled="!passwordsMatch || !userModalInfo.password || !userModalInfo.username">Register</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button class="modal-close is-large" v-on:click="userModalVisible = false" aria-label="close"></button>
+        <button class="modal-close is-large" aria-label="close" @click="userModalVisible = false"></button>
     </div>
 
     <div class="modal" :class="{ 'is-active': categoryModalVisible }">
@@ -266,7 +258,8 @@
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button class="button is-success" @click="addCategory()">Save</button>
+                <button v-if="!categoryModalInfo.id" class="button is-success" @click="addCategory()">Save</button>
+                <button v-else class="button is-success" @click="editCategory()">Update</button>
                 <button class="button" @click="categoryModalVisible = false">Cancel</button>
             </footer>
         </div>
@@ -442,7 +435,9 @@
             }
         },
         computed: {
-        
+            passwordsMatch() {
+                return this.userModalInfo.password === this.userModalInfo.confirmPassword;
+            }
         },
         mounted() {
 
@@ -540,7 +535,7 @@
                 console.log(productInfo);
 
                 axios.put('/product/' + productId, productInfo, {
-                    
+
                 })
                 .then(response => {
                     console.log(response.data);
@@ -561,7 +556,52 @@
 
                 console.log(this.productModalInfo.category);
 
-            }
+            },
+            editCategory() {
+                var categoryInfo = this.categoryModalInfo;
+                axios.put('/category/' + this.categoryModalInfo.id, categoryInfo)
+
+                .then(response => {
+                    console.log('Category updated successfully:', response.data);
+                    this.categoryModalVisible = false;
+                })
+                .catch(error => {
+                    console.error('Category updating error:', error);
+                });
+            },
+            deleteCategory(cat) {
+                axios.delete('/category/' + cat.id)
+
+                .then(response => {
+                    console.log('Category deleted successfully:', response.data);
+                    this.categoryModalVisible = false;
+                })
+                .catch(error => {
+                    console.error('Category updating error:', error);
+                });
+            },
+            deleteUser(usr) {
+                axios.delete('/user/' + usr.id)
+
+                .then(response => {
+                    console.log('Category deleted successfully:', response.data);
+                    this.categoryModalVisible = false;
+                })
+                .catch(error => {
+                    console.error('User updating error:', error);
+                });
+            },
+            deleteProduct(prd) {
+                axios.delete('/product/' + prd.id)
+
+                .then(response => {
+                    console.log('Product deleted successfully:', response.data);
+                    this.categoryModalVisible = false;
+                })
+                .catch(error => {
+                    console.error('Category updating error:', error);
+                });
+            },
         }
     }).mount('#app');
 </script>

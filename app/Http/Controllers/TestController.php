@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Wishlist;
+use App\Models\Cart;
 
 class TestController extends BaseController
 {
@@ -162,25 +163,34 @@ class TestController extends BaseController
             // Here we'll add a new 'base64_image' attribute to each product object
             $product->main_image = $base64Image;
         }
-
-        logger()->debug(__METHOD__, [
-            $products
-        ]);
         
         return view('admin', compact('products', 'categories', 'users'));
     }
 
-    public function getUserWishlist(Request $request)
+    public function getUserCart(Request $request)
     {
         $userAuthed = Auth::user();
         
-        if(!$userAuthed) {
-            return response(404, "User not authed");
+        if (!$userAuthed) {
+            return response()->json(['error' => 'User not authenticated'], 404);
         }
-        $wishlist = Wishlist::where('user_id', $userAuthed->id)
-                            ->with('products')
-                            ->first();
 
-        return $wishlist;
+        // Fetch the cart with products, including main_image blob data
+        $wishlist = Cart::with('products')->where('user_id', $userAuthed->id)->first();
+
+        if (!$wishlist) {
+            return response()->json(['error' => 'User cart not found'], 404);
+        }
+
+        // Convert blob data to base64 for each product's main_image
+        foreach ($wishlist->products as $product) {
+            $product->main_image = base64_encode($product->main_image); // Convert blob to base64
+        }
+
+        logger()->debug(__METHOD__, [
+            $wishlist
+        ]);
+        return response()->json($wishlist);
     }
 }
+

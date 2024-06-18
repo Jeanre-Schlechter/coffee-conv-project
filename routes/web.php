@@ -20,10 +20,10 @@ Route::post('/login', 'App\Http\Controllers\TestController@login');
 
 Route::get('/filter-products', 'App\Http\Controllers\TestController@getFilteredProducts');
 
-Route::get('/wishlist', 'App\Http\Controllers\TestController@getUserWishlist');
+Route::get('/wishlist', 'App\Http\Controllers\TestController@getUserCart');
 Route::get('/admin', 'App\Http\Controllers\TestController@admin');
 
-Route::post('/user', 'App\Http\Controllers\AdminController@addNewUser');
+Route::post('/user', 'App\Http\Controllers\TestController@register');
 Route::post('/category', 'App\Http\Controllers\AdminController@addNewCategory');
 Route::post('/product', 'App\Http\Controllers\AdminController@addNewProduct');
 
@@ -31,6 +31,9 @@ Route::put('/user/{userId}', 'App\Http\Controllers\AdminController@editUser');
 Route::put('/category/{categoryId}', 'App\Http\Controllers\AdminController@editCategory');
 Route::put('/product/{productId}', 'App\Http\Controllers\AdminController@editProduct');
 
+Route::delete('/user/{userId}', 'App\Http\Controllers\AdminController@deleteUser');
+Route::delete('/category/{categoryId}', 'App\Http\Controllers\AdminController@deleteCategory');
+Route::delete('/product/{productId}', 'App\Http\Controllers\AdminController@deleteProduct');
 
 
 // Route::get('/admin', function () {

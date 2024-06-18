@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Wishlist extends Model
+class Cart extends Model
 {
-    protected $table = 'wishlist';
+    protected $table = 'carts';
 
     protected $fillable = ['user_id', 'total_amount'];
 
@@ -17,11 +17,8 @@ class Wishlist extends Model
 
     public function products()
     {
-        return $this->hasManyThrough(Product::class, ProductsCart::class, 
-            'cart_id', 
-            'id', 
-            'id', 
-            'product_id'
-        );
+        return $this->belongsToMany(Product::class, 'products_cart')
+                    ->using(ProductCart::class)
+                    ->withPivot('product_quantity');
     }
 }

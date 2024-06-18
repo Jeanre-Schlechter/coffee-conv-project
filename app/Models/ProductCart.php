@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class ProductCart extends Model
+class ProductCart extends Pivot
 {
     protected $table = 'products_cart';
 
