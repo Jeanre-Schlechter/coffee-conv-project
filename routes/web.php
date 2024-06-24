@@ -44,7 +44,12 @@ Route::get('/purchase', function () {
     return view('purchase');
 });
 
-Route::post('/purchase/cart/pay', 'App\Http\Controllers\TestController@payUserCart');
+Route::get('/purchases', function () {
+    return view('purchases');
+});
+
+Route::get('/purchases/user', 'App\Http\Controllers\TestController@getUserPurchases');
+
 
 // Route::get('/admin', function () {
 //     return view('admin');

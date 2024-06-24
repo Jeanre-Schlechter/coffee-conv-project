@@ -495,6 +495,8 @@
 
                 .then(response => {
                     console.log('Regestration successful:', response.data);
+                    this.closeRegisterModal();
+				    alert("Registered New User");
                 })
                 .catch(error => {
                     console.error('Regestration error:', error);
@@ -507,6 +509,7 @@
                 .then(response => {
                     console.log('Category added successfully:', response.data);
                     this.categoryModalVisible = false;
+				    alert("Added New Category");
                 })
                 .catch(error => {
                     console.error('Category added error:', error);
@@ -523,6 +526,8 @@
                 .then(response => {
                     console.log(response.data);
                     this.productModalVisible = false;
+                    this.addProductModal = false;
+				    alert("Added New Product");
                 })
                 .catch(error => {
                     console.error('Product added error:', error);

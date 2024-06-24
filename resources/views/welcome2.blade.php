@@ -20,8 +20,8 @@
     </a>
     <div class="navbar-dropdown is-boxed">
 		@if(Auth::check())
-			<a class="navbar-item">
-				<i class="fa-solid fa-user"></i>&nbsp; Profile
+			<a href="/purchases" class="navbar-item">
+				<i class="fa-solid fa-user"></i>&nbsp; Purchases
 			</a>
 			<a class="navbar-item" @click="fetchUserWishlist()">
 				<i class="fa-solid fa-cart-shopping"></i>&nbsp; Cart
@@ -259,7 +259,8 @@
 			axios.post('/cart/' + product.id, { qty :this.productCount})
 			.then(response => {
 				console.log('Logout successful:', response);
-				
+				this.addProductModal = false;
+				alert("Added Product To cart");
 			})
 			.catch(error => {
 
@@ -271,7 +272,7 @@
 			axios.delete('/cart/' + product.id)
 			.then(response => {
 				console.log('Logout successful:', response);
-				
+				alert("Removed Product To cart");
 			})
 			.catch(error => {
 

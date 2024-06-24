@@ -306,6 +306,10 @@ class TestController extends BaseController
 
         $purchase->save();
 
+        $cartToDelete = $userAuthed->cart;
+
+        $cartToDelete->delete();
+        
         logger()->debug(__METHOD__, [
             $purchase
         ]);
@@ -330,6 +334,15 @@ class TestController extends BaseController
             $total
         ]);
         return $total;
+    }
+
+    public function getUserPurchases(Request $request) 
+    {
+        $userAuthed = Auth::user();
+
+        $purchases = $userAuthed->purchases;
+
+        return response()->json($purchases);
     }
 }
 

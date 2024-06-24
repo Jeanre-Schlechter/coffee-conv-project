@@ -120,8 +120,7 @@
 		console.log(this.shipping);
 		axios.post('/purchase/cart/pay', {shipping: this.shipping, cart: this.cart})
             .then(response => {
-				console.log('Logout successful:', response.data);
-
+				alert("Succesfuly Paid");
             })
             .catch(error => {
                 console.error('Error fetching products:', error);
