@@ -219,7 +219,7 @@ class TestController extends BaseController
         }
 
         $qty = $request->input('qty');
-        $productCart = ProductCart::where('user_id', $userCart->id)
+        $productCart = ProductCart::where('cart_id', $userCart->id)
                                     ->where('product_id', $productId)
                                     ->first();
 
