@@ -170,6 +170,8 @@
 </div>
 
 </div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GX1E068M1B"></script>
+<script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-GX1E068M1B'); </script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://kit.fontawesome.com/312a26b640.js" crossorigin="anonymous"></script>
 <script type="module">
