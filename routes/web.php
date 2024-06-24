@@ -35,6 +35,16 @@ Route::delete('/user/{userId}', 'App\Http\Controllers\AdminController@deleteUser
 Route::delete('/category/{categoryId}', 'App\Http\Controllers\AdminController@deleteCategory');
 Route::delete('/product/{productId}', 'App\Http\Controllers\AdminController@deleteProduct');
 
+Route::post('/cart/{productId}', 'App\Http\Controllers\TestController@addProductToUserCart');
+Route::delete('/cart/{productId}', 'App\Http\Controllers\TestController@removeProductFromUserCart');
+
+Route::get('/purchase/cart/', 'App\Http\Controllers\TestController@getUserCart');
+
+Route::get('/purchase', function () {
+    return view('purchase');
+});
+
+Route::post('/purchase/cart/pay', 'App\Http\Controllers\TestController@payUserCart');
 
 // Route::get('/admin', function () {
 //     return view('admin');

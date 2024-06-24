@@ -9,8 +9,11 @@ class ProductCart extends Pivot
 {
     protected $table = 'products_cart';
 
-    protected $fillable = ['product_quantity'];
-
+    public $timestamps = false;
+    
+    protected $fillable = [
+        'user_id', 'product_id', 'product_quantity'
+    ];
     public function product()
     {
         return $this->belongsTo(Product::class);

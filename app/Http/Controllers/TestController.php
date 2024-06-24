@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller as BaseController;
 
+use App\Models\Purchase;
 use App\Models\Product;
+use App\Models\ProductCart;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Wishlist;
@@ -179,18 +181,155 @@ class TestController extends BaseController
         $wishlist = Cart::with('products')->where('user_id', $userAuthed->id)->first();
 
         if (!$wishlist) {
-            return response()->json(['error' => 'User cart not found'], 404);
+            $wishlist = new Cart();
+            $wishlist->user_id = $userAuthed->id;
         }
 
-        // Convert blob data to base64 for each product's main_image
-        foreach ($wishlist->products as $product) {
-            $product->main_image = base64_encode($product->main_image); // Convert blob to base64
+        if($wishlist->products){
+             // Convert blob data to base64 for each product's main_image
+            foreach ($wishlist->products as $product) {
+                $product->main_image = base64_encode($product->main_image);
+            }
         }
+       
+        return response()->json($wishlist);
+    }
+
+    public function addProductToUserCart(Request $request, int $productId)
+    {
 
         logger()->debug(__METHOD__, [
-            $wishlist
+            $request->all(),
+            $productId
         ]);
-        return response()->json($wishlist);
+
+        $userAuthed = Auth::user();
+
+        if (!$userAuthed) {
+            return response()->json(['error' => 'User not authenticated'], 404);
+        }
+
+        $userCart = $userAuthed->cart;
+
+        if(!$userCart) {
+            $userCart = new Cart();
+            $userCart->user_id = $userAuthed->id;
+            $userCart->total_amount = 0;
+            $userCart->save();
+        }
+
+        $qty = $request->input('qty');
+        $productCart = ProductCart::where('user_id', $userCart->id)
+                                    ->where('product_id', $productId)
+                                    ->first();
+
+
+        logger()->debug(__METHOD__, [
+            $productCart
+        ]);
+
+        if ($productCart) {
+            $productCart->product_quantity = $qty;
+            $productCart->save();
+        } else {
+            $productCart = new ProductCart();
+
+            $productCart->cart_id = $userCart->id;
+            $productCart->product_id = $productId;
+            $productCart->product_quantity = $qty;
+
+            $productCart->save();
+        }
+    
+        $cartTotal = $this->recalculateCartTotal($userCart);
+
+        $userCart->total_amount = $cartTotal;
+        $userCart->save();
+
+        return response()->json($productCart);
+    }
+
+    public function removeProductFromUserCart(Request $request, int $productId)
+    {
+        $userAuthed = Auth::user();
+        
+        if (!$userAuthed) {
+            return response()->json(['error' => 'User not authenticated'], 404);
+        }
+
+        $userCart = $userAuthed->cart;
+
+
+        $cart = ProductCart::where('cart_id', $userCart->id)
+                                ->where('product_id', $productId)
+                                ->first();
+
+        if (!$cart) {
+            return response()->json(['error' => 'Item Not Found'], 404);
+        }
+
+        $cart->delete();
+       
+        $cartTotal = $this->recalculateCartTotal($userCart);
+
+        $userCart->total_amount = $cartTotal;
+        $userCart->save();
+
+        logger()->debug(__METHOD__, [
+            $userCart
+        ]);
+        return response()->json("Success");
+    }
+
+    public function payUserCart(Request $request)
+    {
+        $userAuthed = Auth::user();
+        
+        if (!$userAuthed) {
+            return response()->json(['error' => 'User not authenticated'], 404);
+        }
+
+        $userCart = $userAuthed->cart;
+        $cart = $request->cart;
+        $shippingAddress = $request->shipping['address'];
+        $shippingInfo = $request->shipping['info'];
+
+        $purchase = new Purchase();
+
+        $purchase->user_id = $userAuthed->id;
+        $purchase->cart_id = $cart['id'];
+        $purchase->total_amount = $cart['total_amount'];
+        $purchase->is_paid = true;
+        $purchase->shipping_address = $shippingAddress;
+        $purchase->shipping_information = $shippingInfo;
+        $purchase->shipping_status = "Packing";
+
+        $purchase->save();
+
+        logger()->debug(__METHOD__, [
+            $purchase
+        ]);
+        return response()->json("Success");
+    }
+
+    private function recalculateCartTotal(Cart $cart)
+    {
+        $products = $cart->products;
+
+        
+        $total = 0;
+       foreach($products as $product) {
+            $price = $product->price;
+            $quantity = $product->pivot->product_quantity;
+
+            $productTotal = $price * $quantity;
+
+            $total += $productTotal;
+       }
+       logger()->debug(__METHOD__, [
+            $total
+        ]);
+        return $total;
     }
 }
 

@@ -61,32 +61,29 @@
     <div class="hero-body">
         <div class="container">
             <div class="columns is-multiline">
-                <!-- Loop through each product -->
                 <div v-for="(product, index) in products.data" :key="product.id" class="column is-3">
                     <div class="card">
                         <div class="card-image">
                             <figure class="image is-4by3">
-                                <!-- Use the product image -->
-                                <img :src="'data:image/jpeg;base64,' + product.main_image" alt="Product Image" /> <!-- Assuming each product has an 'image_url' property -->
+                                <img :src="'data:image/jpeg;base64,' + product.main_image" alt="Product Image" /> 
                             </figure>
                         </div>
                         <div class="card-content">
                             <div class="media">
                                 <div class="media-content">
-                                    <!-- Display product name -->
                                     <p class="title is-4">@{{ product.name }}</p>
-                                    <!-- Display product price -->
                                     <p class="subtitle is-6">R @{{ product.price }}</p>
                                 </div>
                             </div>
-                            <!-- Display product description -->
                             <div class="content">
                                 @{{ product.description }}
-                                <br />
-                                <!-- Assuming you want to display product creation date -->
-                                <time v-if="product.created_at" :datetime="product.created_at">@{{ product.created_at }}</time>
                             </div>
                         </div>
+						<footer class="card-footer">
+							<p class="card-footer-item">
+							<span><a class="button" v-on:click="openAddProductToCartModal(product)"> Add To Cart </a> </span>
+							</p>
+						</footer>
                     </div>
                 </div>
             </div>
@@ -134,6 +131,7 @@
 										<img :src="'data:image/jpeg;base64,' +product.main_image" />
 									</figure> 
 								</td>
+								<td><button class="button is-warning" @click="removeProductFromCart(product)">Remove</button></td>
 							</tr>
 							<tr>
 								<td>&nbsp;</td>
@@ -145,11 +143,28 @@
 					</table>
 				</section>
 				<footer class="modal-card-foot">
-					<button class="button is-success" @click="">Checkout</button>
+					<a href="/purchase" class="button is-success">Checkout</a>
 					<button class="button" @click="wishlistModalVisible = false">Cancel</button>
 				</footer>
 			</div>
 			<button class="modal-close is-large" v-on:click="wishlistModalVisible = false" aria-label="close"></button>
+		</div>
+
+		<div class="modal" :class="{ 'is-active': addProductModal }">
+			<div class="modal-background" v-on:click="addProductModal = false"></div>
+			<div class="modal-card">
+				<header class="modal-card-head">
+					<p class="modal-card-title">Add To Cart</p>
+				</header>
+				<section class="modal-card-body">
+					<input class="input" type="number" min="1" max="product.qty" placeholder="Enter Amount" v-model="productCount"> </input>
+				</section>
+				<footer class="modal-card-foot">
+					<button class="button is-success" @click="addProductToCart(selectedProduct)">Confirm</button>
+					<button class="button" @click="addProductModal = false">Cancel</button>
+				</footer>
+			</div>
+			<button class="modal-close is-large" v-on:click="addProductModal = false" aria-label="close"></button>
 		</div>
 </div>
 </div>
@@ -171,7 +186,10 @@
         products: [],
         categories: [],
 		wishlistModalVisible: false,
-		wishlistData: []
+		wishlistData: [],
+		addProductModal: false,
+		productCount: 0,
+		selectedProduct: null
       }
     },
     created() {
@@ -185,12 +203,10 @@
 	  logout() {
         axios.post('/logout')
 			.then(response => {
-				// Handle successful login
 				console.log('Logout successful:', response.data);
 				
 			})
 			.catch(error => {
-				// Handle login error
 				console.error('Logout error:', error);
 			});
 		},
@@ -198,12 +214,10 @@
 			console.log(category);
 			axios.get('/filter-products', { params: { category: category } })
 				.then(response => {
-					// Handle successful login
 					this.products = response.data;
 					console.log('Logout successful:', response.data);
 				})
 				.catch(error => {
-					// Handle login error
 					console.error('Logout error:', error);
 				});
 		},
@@ -234,6 +248,34 @@
 				console.error('Error fetching products:', error);
 
 			});
+    	},
+		openAddProductToCartModal(product) {
+			this.addProductModal = true;
+			this.selectedProduct = product;
+    	},
+		addProductToCart(product) {
+			axios.post('/cart/' + product.id, { qty :this.productCount})
+			.then(response => {
+				console.log('Logout successful:', response);
+				
+			})
+			.catch(error => {
+
+				console.error('Error fetching products:', error);
+
+			});
+    	},
+		removeProductFromCart(product) {
+			axios.delete('/cart/' + product.id)
+			.then(response => {
+				console.log('Logout successful:', response);
+				
+			})
+			.catch(error => {
+
+				console.error('Error fetching products:', error);
+
+			});
     	}
     },
     setup() {
@@ -246,9 +288,5 @@
 
 </script>
 <style lang="scss">
-/* Import Bulma styles directly into the component */
-@import "https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css";
-
-
-/* Add custom styles if needed */
+	@import "https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css";
 </style>
